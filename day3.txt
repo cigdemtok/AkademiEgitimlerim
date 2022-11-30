@@ -1,0 +1,151 @@
+-- 1->insert
+INSERT INTO baskets (total_price, product_id,customer_id)
+VALUES (300, 10, 5);
+
+--2-> update
+UPDATE baskets
+SET product_id =9
+WHERE id=4
+
+-- 3-> delete
+
+delete from customers
+where id=6
+
+--4-> select top (Müşteri numarası 054 ile başlayan ilk 3 kaydı gösterir)
+SELECT * FROM customers  
+where phone like '054%'
+fetch first 3 rows only ;
+
+--5->Min ve maks kullanımı
+
+SELECT MIN(total_price) AS Fiyatı_en_düşük
+FROM baskets;
+
+
+SELECT MAX(total_price) AS Fiyatı_en_yüksek
+FROM baskets;
+
+
+-- 6->müşterinin kaç adet siparişi olduğunu toplar
+
+SELECT COUNT(customer_id)
+FROM orders
+WHERE customer_id=2;
+
+-- 7-> müşterilerin verdiği sipariş bilgilerini tutar.
+Select * from customers c
+inner join orders o
+on c.id=o.customer_id
+
+-- 8->  kategori id si 1 olanlar ürünlerin toplam fiyatını verir.
+SELECT SUM(unit_price)
+FROM products
+WHERE category_id=1;
+
+
+-- 9->stok miktarı 100 den fazla olan ürün ve sipariş detayını getirir
+
+select *  from products 
+inner join order_details 
+on products.id=order_details.product_id
+where stock>100
+
+--10-> Customer id 1 olanların adres verisini getirir.
+
+select * from addresses
+left join countries
+on addresses.id=countries.address_id
+full outer join  cities
+on countries.id=cities.country_id
+full outer join  districts
+on cities.id=districts.city_id
+full outer join  streets
+on districts.id=streets.district_id
+where customer_id=1;
+
+---- 11-> müşteriye ait olan sipariş numarasını getirir.
+SELECT c.name,c.surname,o.id FROM customers c
+right JOIN orders o
+on c.id = o.customer_id
+ORDER BY o.id
+
+-- 12-> iade edilen ürünlerden hatalı ürünleri getirir.
+
+select * from order_returns o
+inner join refund r
+on o.id=r.order_return_id
+where message='hatalı ürün'
+
+-- 13-> iade edilen ürünleri getirir
+select * from refund r
+inner join order_returns o
+on r.order_return_id= o.id
+inner join product_return pr
+on o.id=pr.order_return_id
+
+-- 14-> iade edilen ürüün adı, fiyat ve renk bilgisini verir.
+
+select p.name as ürün_adı, p.unit_price as ürün_fiyatı,c.name as ürün_rengi from refund r
+inner join order_returns o
+on r.order_return_id= o.id
+inner join order_details od
+on o.order_detail_id=od.id
+inner join products p
+on od.product_id=p.id
+inner join product_color pc
+on p.id=pc.product_id
+inner join colors c
+on pc.color_id=c.id
+
+-- 15-> ürün satıcısının rating ve takipçi bilgisi
+
+select p.name as ürün_adı, s.name as ürün_marka,s.rating,s.follower_count from products  p
+inner join product_sellers ps
+on  p.id=ps.product_id
+inner join sellers s
+on ps.seller_id=s.id
+
+
+-- 16-> hangi ürünün hangi kurye tarafından taşınmıştır.
+
+select * from order_returns o
+full outer join cargo_companies c
+on o.id=c.order_return_id
+inner join shippers s
+on c.id=s.cargo_company_id
+
+-- 17-> ürün markası puma olan ürünleri getirir.
+
+select * from products
+inner join product_brand
+on products.id=product_brand.product_id
+inner join brands
+on brands.id=product_brand.brand_id
+where brands.name='puma'
+
+--18-> ürünlerin renklerini getirir. 
+
+select * from products
+inner join product_color
+on products.id=product_color.product_id
+inner join colors
+on colors.id=product_color.color_id;
+
+--19-> ürün sipariş detaylarını getirir. 
+
+select * from  orders o 
+inner join order_details od
+on o.id= od.order_id
+inner join products p
+on od.product_id= p.id
+
+--20 ->kargo şirketindeki siparişlerden mng kargo lie iletilenler
+
+select * from  orders o
+inner join cargo_companies cp
+on o.cargo_company_id= cp.id
+where cp.name='mng'
+
+
+
